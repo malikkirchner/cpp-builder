@@ -46,12 +46,15 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && groupadd -g ${gid} ${group}                                                  \
     && useradd -u ${uid} -g ${gid} -s /bin/bash -m -d /home/${user} ${user}         \
     && su ${user} -c 'mkdir -p /home/builder/ccache'                                \
+    # create workspace directories
+    && mkdir /workspace && chown -R ${user} /workspace                              \
+    && mkdir /__w && chown -R ${user} /__w                                          \
     # build and install Clang's libc++ (Clang dependency)
     && su ${user} -c 'gpg --recv-key A2C794A986419D8A | true'                       \
     && su ${user} -c 'gpg --recv-key 0FC3042E345AD05D | true'                       \
     && su ${user} -c 'git clone https://aur.archlinux.org/libc++.git  /tmp/libc++'  \
     && cd /tmp/libc++                                                               \
-    # FIXME: test are failing due to a deprecated python function call, ignore failure for now
+    # FIXME: tests are failing due to a deprecated python function call, ignore failure for now
     && MAKEFLAGS="-j$(nproc)" CC=clang CXX=clang++ CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg | true \
     && yes | pacman -U /tmp/libc++/*.pkg.tar.xz | true                              \
     # build and install perl-perlio-gzip (LCOV dependency)
@@ -70,6 +73,7 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && yes | pacman -Scc | true
 
 VOLUME /workspace
+VOLUME /__w
 VOLUME /home/builder/ccache
 
 WORKDIR /workspace

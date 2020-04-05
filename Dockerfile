@@ -10,8 +10,6 @@ ARG CXX_FLAGS="-march=x86_64 -O2 -pipe -fstack-protector-strong"
 
 ENV UBSAN_OPTIONS='print_stacktrace=1'
 
-USER root
-
 COPY mirrorlist /etc/pacman.d/mirrorlist
 COPY mirrorupgrade.hook /etc/pacman.d/hooks/mirrorupgrade.hook
 COPY ccache.conf /etc/ccache.conf
@@ -30,7 +28,7 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && pacman-key --populate archlinux                                              \
     # update and rank mirror list by speed
     && pacman -Sy --noconfirm --needed reflector rsync                              \
-    && reflector --country 'Germany' --protocol https --latest 100 --age 12 --sort rate --save /etc/pacman.d/mirrorlist \
+    && reflector --country 'US' --country 'Germany' --protocol https --latest 100 --age 12 --sort rate --save /etc/pacman.d/mirrorlist \
     && cat /etc/pacman.d/mirrorlist                                                 \
     # update system and install build software
     && ( pacman -Syu --noconfirm | true )                                           \
@@ -48,7 +46,6 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && su ${user} -c 'mkdir -p /home/builder/ccache'                                \
     # create workspace directories
     && mkdir /workspace && chown -R ${user} /workspace                              \
-    && mkdir /__w && chown -R ${user} /__w                                          \
     # build and install Clang's libc++ (Clang dependency)
     && su ${user} -c 'gpg --recv-key A2C794A986419D8A | true'                       \
     && su ${user} -c 'gpg --recv-key 0FC3042E345AD05D | true'                       \
@@ -73,9 +70,6 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && yes | pacman -Scc | true
 
 VOLUME /workspace
-VOLUME /__w
 VOLUME /home/builder/ccache
 
 WORKDIR /workspace
-
-USER ${user}

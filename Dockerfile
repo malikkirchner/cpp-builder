@@ -41,7 +41,7 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
                              sloccount libtool make unzip python-pytest perl-json   \
                              pkg-config fakeroot libunwind openssh clang            \
                              patchelf gdb openmp nodejs llvm gcc-fortran nasm       \
-                             lsb-release bison flex byacc gettext                   \
+                             lsb-release bison flex byacc gettext boost openssl     \
     # create builder user and group
     && groupadd -g ${gid} ${group}                                                  \
     && useradd -u ${uid} -g ${gid} -s /bin/bash -m -d /home/${user} ${user}         \

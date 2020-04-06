@@ -40,6 +40,7 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
                              pkg-config fakeroot libunwind openssh clang            \
                              patchelf gdb openmp nodejs llvm gcc-fortran nasm       \
                              lsb-release bison flex byacc gettext boost openssl     \
+                             gtest protobuf                                         \
     # create builder user and group
     && groupadd -g ${gid} ${group}                                                  \
     && useradd -u ${uid} -g ${gid} -s /bin/bash -m -d /home/${user} ${user}         \

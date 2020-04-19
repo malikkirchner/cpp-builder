@@ -40,7 +40,7 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
                              pkg-config fakeroot libunwind openssh clang            \
                              patchelf gdb openmp nodejs llvm gcc-fortran nasm       \
                              lsb-release bison flex byacc gettext boost openssl     \
-                             gtest protobuf                                         \
+                             gtest protobuf libffi                                  \
     # create builder user and group
     && groupadd -g ${gid} ${group}                                                  \
     && useradd -u ${uid} -g ${gid} -s /bin/bash -m -d /home/${user} ${user}         \
@@ -65,6 +65,8 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && cd /tmp/lcov                                                                 \
     && MAKEFLAGS="-j$(nproc)" CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg \
     && yes | pacman -U /tmp/lcov/*.pkg.tar.xz                                       \
+    # install conan
+    && pip install conan                                                            \
     # cleanup
     && (pacman -Rns --noconfirm $(pacman -Qtdq) || true)                            \
     && rm -rf /tmp/*                                                                \

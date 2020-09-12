@@ -55,13 +55,8 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     # FIXME: tests are failing due to a deprecated python function call, ignore failure for now
     && MAKEFLAGS="-j$(nproc)" CC=clang CXX=clang++ CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg | true \
     && yes | pacman -U /tmp/libc++/*.pkg.tar.xz | true                              \
-    # build and install perl-perlio-gzip (LCOV dependency)
-    && su ${user} -c 'git clone https://aur.archlinux.org/perl-perlio-gzip.git /tmp/perl-perlio-gzip' \
-    && cd /tmp/perl-perlio-gzip                                                     \
-    && MAKEFLAGS="-j$(nproc)" CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg \
-    && yes | pacman -U /tmp/perl-perlio-gzip/*.pkg.tar.xz                           \
     # build and install
-    && su ${user} -c 'git clone https://aur.archlinux.org/lcov-git.git /tmp/lcov'   \
+    && su ${user} -c 'git clone https://aur.archlinux.org/lcov.git /tmp/lcov'   \
     && cd /tmp/lcov                                                                 \
     && MAKEFLAGS="-j$(nproc)" CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg \
     && yes | pacman -U /tmp/lcov/*.pkg.tar.xz                                       \

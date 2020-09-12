@@ -10,8 +10,6 @@ ARG CXX_FLAGS="-march=x86_64 -O2 -pipe -fstack-protector-strong"
 
 ENV UBSAN_OPTIONS='print_stacktrace=1'
 
-COPY mirrorlist /etc/pacman.d/mirrorlist
-COPY mirrorupgrade.hook /etc/pacman.d/hooks/mirrorupgrade.hook
 COPY ccache.conf /etc/ccache.conf
 
 # explicitly generate and use en_US.UTF-8 locale
@@ -24,14 +22,11 @@ RUN    echo "LANG=en_US.UTF-8" > /etc/locale.conf                               
 
 # update system and install build env
 RUN    rm -fr /etc/pacman.d/gnupg                                                   \
+    && pacman -Sy                                                                   \
     && pacman-key --init                                                            \
     && pacman-key --populate archlinux                                              \
-    # update and rank mirror list by speed
-    && pacman -Sy --noconfirm --needed reflector rsync                              \
-    && reflector --country 'US' --country 'Germany' --protocol https --latest 100 --age 12 --sort rate --save /etc/pacman.d/mirrorlist \
-    && cat /etc/pacman.d/mirrorlist                                                 \
     # update system and install build software
-    && ( pacman -Syu --noconfirm | true )                                           \
+    && pacman -Syu --noconfirm | true                                               \
     && pacman -S --noconfirm --needed                                               \
                              gcc git git-lfs cmake ninja vim automake autoconf      \
                              m4 wget ccache doxygen graphviz python patch file      \

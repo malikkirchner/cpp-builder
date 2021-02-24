@@ -1,4 +1,4 @@
-FROM archlinux/base
+FROM archlinux/archlinux:base
 
 ARG user=builder
 ARG group=builder
@@ -14,23 +14,15 @@ COPY ccache.conf /etc/ccache.conf
 
 # explicitly generate and use en_US.UTF-8 locale
 ENV LANG=en_US.UTF-8
-
 RUN    echo "LANG=en_US.UTF-8" > /etc/locale.conf                                   \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen                                   \
-    && echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen                                   \
     && locale-gen
 
 # update system and install build env
-RUN    rm -fr /etc/pacman.d/gnupg                                                   \
-    && pacman -Sy                                                                   \
-    && pacman-key --init                                                            \
-    && pacman-key --populate archlinux                                              \
-    # update system and install build software
-    && pacman -Syu --noconfirm | true                                               \
-    && pacman -S --noconfirm --needed                                               \
+RUN    pacman -Syu --noconfirm --needed                                             \
                              gcc git git-lfs cmake ninja vim automake autoconf      \
                              m4 wget ccache doxygen graphviz python patch file      \
-                             python-pip python-virtualenv pixz pigz rsync           \
+                             python-pip python-virtualenv pixz pigz rsync glibc     \
                              sloccount libtool make unzip python-pytest perl-json   \
                              pkg-config fakeroot libunwind openssh clang            \
                              patchelf gdb openmp nodejs llvm gcc-fortran nasm       \
@@ -49,12 +41,12 @@ RUN    rm -fr /etc/pacman.d/gnupg                                               
     && cd /tmp/libc++                                                               \
     # FIXME: tests are failing due to a deprecated python function call, ignore failure for now
     && MAKEFLAGS="-j$(nproc)" CC=clang CXX=clang++ CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg | true \
-    && yes | pacman -U /tmp/libc++/*.pkg.tar.xz | true                              \
+    && yes | pacman -U /tmp/libc++/*.pkg.tar.* | true                               \
     # build and install
-    && su ${user} -c 'git clone https://aur.archlinux.org/lcov.git /tmp/lcov'   \
+    && su ${user} -c 'git clone https://aur.archlinux.org/lcov.git /tmp/lcov'       \
     && cd /tmp/lcov                                                                 \
     && MAKEFLAGS="-j$(nproc)" CFLAGS="${C_FLAGS}" CXXFLAGS="${CXX_FLAGS}" su ${user} -c makepkg \
-    && yes | pacman -U /tmp/lcov/*.pkg.tar.xz                                       \
+    && yes | pacman -U /tmp/lcov/*.pkg.tar.*                                        \
     # install conan
     && pip install conan                                                            \
     # cleanup
